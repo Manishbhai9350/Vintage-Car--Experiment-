@@ -399,6 +399,38 @@ function Animate() {
 
 requestAnimationFrame(Animate);
 
+// Navigation
+
+const buttons = document.querySelectorAll("nav button");
+
+// Move pill to active button
+function setActive(btn) {
+  const container = btn.parentElement;
+  const pill = document.getElementById("pill");
+  const btnRect = btn.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  // Remove active from all
+  container
+    .querySelectorAll(".nav-link")
+    .forEach((b) => b.classList.remove("active"));
+
+  btn.classList.add("active");
+
+  // Slide pill to new position
+  pill.style.left = btnRect.left - containerRect.left + "px";
+  pill.style.width = btnRect.width + "px";
+  pill.style.height = btnRect.height + "px";
+}
+
+setActive(buttons[0]);
+
+buttons.forEach((Btn) => {
+  Btn.addEventListener("click", () => {
+    setActive(Btn);
+  });
+});
+
 function resize() {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
