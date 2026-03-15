@@ -13,7 +13,9 @@
   --white-08:     rgba(255,255,255,0.08);
   --white-04:     rgba(255,255,255,0.04);
 
-  --nav-h: 60px;
+  --nav-h:        60px;
+  --side-pad:     56px;
+  --bottom-pad:   88px;
 }
 
 html, body {
@@ -148,8 +150,8 @@ nav {
 
 .hero-left {
   position: fixed;
-  left: 56px;
-  bottom: 88px;
+  left: var(--side-pad);
+  bottom: var(--bottom-pad);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -191,7 +193,7 @@ nav {
 .title-line {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(52px, 6vw, 86px);
+  font-size: clamp(44px, 6vw, 86px);
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -0.01em;
@@ -255,8 +257,8 @@ nav {
 
 .bottom-tag {
   position: fixed;
-  right: 56px;
-  bottom: 88px;
+  right: var(--side-pad);
+  bottom: var(--bottom-pad);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -284,7 +286,7 @@ nav {
 
 .scroll-hint {
   position: fixed;
-  left: 56px;
+  left: var(--side-pad);
   bottom: 32px;
   z-index: 10;
   display: flex;
@@ -345,4 +347,138 @@ nav {
 .clip-wrap {
   overflow: hidden;
   display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   Tablet  → ≤ 900px
+   Mobile  → ≤ 600px
+   Tiny    → ≤ 380px
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Tablet (≤ 900px) ──────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  :root {
+    --side-pad:   36px;
+    --bottom-pad: 72px;
+  }
+
+  nav {
+    top: 16px;
+    width: calc(100% - 32px);
+    padding: 0 8px 0 18px;
+  }
+
+  .hero-body {
+    font-size: 15px;
+    max-width: 300px;
+  }
+
+  .stat-value { font-size: 24px; }
+
+  /* tag overlaps car at this width — push it up */
+  .bottom-tag {
+    bottom: auto;
+    top: calc(var(--nav-h) + 40px);
+    right: var(--side-pad);
+  }
+}
+
+/* ─── Mobile (≤ 600px) ──────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  :root {
+    --side-pad:   20px;
+    --bottom-pad: 20px;
+    --nav-h:      52px;
+  }
+
+  /* Nav */
+  nav {
+    top: 14px;
+    width: calc(100% - 28px);
+    height: var(--nav-h);
+    padding: 0 6px 0 16px;
+    gap: 8px;
+  }
+  .logo-sub  { display: none; }
+  .logo-main { font-size: 12px; }
+  .nav-link  { padding: 6px 14px; font-size: 11px; }
+  .nav-cta   { padding: 8px 14px; font-size: 10px; gap: 5px; }
+  .nav-cta svg { width: 10px; height: 10px; }
+
+  /* Hero — full width at bottom */
+  .hero-left {
+    left: var(--side-pad);
+    right: var(--side-pad);
+    bottom: var(--bottom-pad);
+    max-width: none;
+  }
+
+  .hero-eyebrow  { margin-bottom: 10px; }
+  .eyebrow-line  { width: 20px; }
+  .eyebrow-text  { font-size: 10px; }
+
+  .title-line { font-size: clamp(38px, 11vw, 56px); }
+
+  .hero-body {
+    font-size: 14px;
+    line-height: 1.65;
+    max-width: 100%;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Stats */
+  .hero-stats   { gap: 16px; }
+  .stat-value   { font-size: 20px; }
+  .stat-label   { font-size: 9px; }
+  .stat-divider { height: 24px; }
+
+  /* Tag — move to top right below nav */
+  .bottom-tag {
+    bottom: auto;
+    top: calc(var(--nav-h) + 30px);
+    right: var(--side-pad);
+  }
+  .tag-edition { font-size: 16px; }
+
+  /* Scroll hint — bottom right */
+  .scroll-hint {
+    left: auto;
+    right: var(--side-pad);
+    bottom: 14px;
+  }
+
+  /* Corners — smaller */
+  .corner       { width: 14px; height: 14px; }
+  .corner-tl    { top: 12px; left: 12px; }
+  .corner-br    { bottom: 12px; right: 12px; }
+}
+
+/* ─── Tiny (≤ 380px) ────────────────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  :root { --bottom-pad: 16px; }
+
+  .title-line { font-size: clamp(32px, 10vw, 44px); }
+
+  /* body copy too cramped at this size */
+  .hero-body  { display: none; }
+
+  .hero-stats { gap: 12px; }
+  .stat-value { font-size: 18px; }
+
+  /* Nav links shorter */
+  .nav-link   { padding: 6px 10px; letter-spacing: 0; }
+
+  /* Hide tag entirely */
+  .bottom-tag { display: none; }
+
+  /* Hide scroll hint */
+  .scroll-hint { display: none; }
 }
