@@ -3,17 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Car Experiment</title>
+    <title>VELOX — Automotive</title>
+
+    <!-- Fonts: Cormorant Garamond (display serif) + DM Mono (label) -->
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin /> -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <main>
-      <nav class="nav-links" id="navLinks">
+    <canvas></canvas>
+
+    <!-- ── Nav ─────────────────────────────────────────────────── -->
+    <nav>
+      <div class="nav-logo">
+        <span class="logo-main">VELOX</span>
+        <span class="logo-sub">Automotive</span>
+      </div>
+
+      <div class="nav-links" id="navLinks">
         <div class="pill" id="pill"></div>
-        <button class="nav-link" data-theme="0">Orange</button>
-        <button class="nav-link active" data-theme="1">Sky Blue</button>
-      </nav>
-      <canvas></canvas>
-    </main>
-    <script type="module" src="/src/main.js"></script>
+        <button class="nav-link active" data-theme="0">Inferno</button>
+        <button class="nav-link" data-theme="1">Glacier</button>
+      </div>
+
+      <a href="mailto:developermanish93@gmail.com" class="nav-cta">
+        Contact
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M2.5 6h7M6 2.5l3.5 3.5L6 9.5"
+            stroke="currentColor"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+    </nav>
+
+    <!-- ── Hero Text Left ───────────────────────────────────────── -->
+    <div class="hero-left" id="heroLeft">
+      <div class="hero-eyebrow" id="heroEyebrow">
+        <span class="eyebrow-line"></span>
+        <span class="eyebrow-text" id="eyebrowText">Series I — 2025</span>
+      </div>
+
+      <h1 class="hero-title" id="heroTitle">
+        <span class="title-line" id="titleLine1"></span>
+        <span class="title-line title-italic" id="titleLine2"></span>
+      </h1>
+
+      <p class="hero-body" id="heroBody"></p>
+
+      <div class="hero-stats" id="heroStats">
+        <div class="stat">
+          <span class="stat-value" id="stat1Val"></span>
+          <span class="stat-label" id="stat1Lab"></span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value" id="stat2Val"></span>
+          <span class="stat-label" id="stat2Lab"></span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value" id="stat3Val"></span>
+          <span class="stat-label" id="stat3Lab"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Bottom Right Tag ─────────────────────────────────────── -->
+    <div class="bottom-tag" id="bottomTag">
+      <span class="tag-label" id="tagLabel"></span>
+      <span class="tag-edition" id="tagEdition"></span>
+    </div>
+
+    <!-- ── Bottom Left scroll hint ─────────────────────────────── -->
+    <div class="scroll-hint">
+      <span class="scroll-text">Drag to explore</span>
+      <div class="scroll-track"><div class="scroll-thumb"></div></div>
+    </div>
+
+    <!-- ── Corner decorations ──────────────────────────────────── -->
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-br"></div>
+
+    <script type="module" src="./src/ui.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

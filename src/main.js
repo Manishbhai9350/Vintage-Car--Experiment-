@@ -48,49 +48,42 @@ const COLORS = [
   "#183e6c", // 12
 ];
 
-// Car slide animation config
 const CAR_ANIM = {
   floatAmplitude: 0.3,
-  floatSpeed: .3,
-  slideDistance: 50, // how far above/below screen cars travel
-  slideDuration: 1.2, // seconds for slide transition
+  floatSpeed: 0.3,
 };
+
+const CAR_ROTATION = {
+  x: 0,
+  y: -Math.PI / 4,
+  z: 0,
+};
+
+const LERP_SPEED = 0.75;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
 let currentThemeIndex = 1; // start on skyblue
 let isTransitioning = false;
 
-// Per-car slide state: y position and target y
-const carState = [
-  { y: 0, targetY: 0, visible: false }, // car 0 (orange)
-  { y: 0, targetY: 0, visible: true }, // car 1 (skyblue) — starts active
-];
+const mouse = { x: 0, y: 0 };
+const targetRotation = { x: 0, y: 0 };
 
-const CAR_ROTATION = {
-  x: 0, // 45 deg
-  y: -Math.PI / 4, // 45 deg
-  z: 0,
-};
-
-// Blob color lerp state
 const blobLerp = {
   color1From: new Color(),
   color1To: new Color(),
   color2From: new Color(),
   color2To: new Color(),
-  t: 1, // 1 = done, 0 = just started
+  t: 1,
 };
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 const canvas = document.querySelector("canvas");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
 
 const lil = new GUI();
-const stats = new Stats();
-document.body.appendChild(stats.dom);
+// const stats = new Stats();
+// document.body.appendChild(stats.dom);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x071a1f);
@@ -167,26 +160,22 @@ const glassMaterial = new THREE.MeshPhysicalMaterial({
 
 // ─── Car Containers ──────────────────────────────────────────────────────────
 
-// Each container holds one body + one glass
 const Car1Container = new THREE.Group(); // orange theme
 const Car2Container = new THREE.Group(); // skyblue theme
+
+Car1Container.rotation.set(CAR_ROTATION.x, CAR_ROTATION.y, CAR_ROTATION.z);
+Car2Container.rotation.set(CAR_ROTATION.x, CAR_ROTATION.y, CAR_ROTATION.z);
+
+// Orange starts hidden, skyblue starts visible
+Car1Container.visible = false;
+Car2Container.visible = true;
 
 scene.add(Car1Container);
 scene.add(Car2Container);
 
-// Orange car starts offscreen above, skyblue starts at origin (active)
-Car1Container.position.y = CAR_ANIM.slideDistance;
-Car2Container.position.y = 0;
-
-carState[0].y = CAR_ANIM.slideDistance;
-carState[0].targetY = CAR_ANIM.slideDistance;
-carState[1].y = 0;
-carState[1].targetY = 0;
-
 // ─── Load Car Models ─────────────────────────────────────────────────────────
 
 GLB.load("/car_body.glb", (glb) => {
-  // Car 1 body (orange)
   const body1 = glb.scene;
   body1.scale.setScalar(0.01);
   body1.traverse((node) => {
@@ -194,7 +183,6 @@ GLB.load("/car_body.glb", (glb) => {
   });
   Car1Container.add(body1);
 
-  // Car 2 body (skyblue)
   const body2 = glb.scene.clone();
   body2.scale.setScalar(0.01);
   body2.traverse((node) => {
@@ -204,25 +192,20 @@ GLB.load("/car_body.glb", (glb) => {
 });
 
 GLB.load("/car_glass.glb", (glb) => {
-  // Car 1 glass
   const glass1 = glb.scene;
-  glass1.scale.setScalar(0.01); // match body scale
+  glass1.scale.setScalar(0.01);
   glass1.traverse((node) => {
     if (node?.isMesh) node.material = glassMaterial;
   });
   Car1Container.add(glass1);
 
-  // Car 2 glass — clone
   const glass2 = glb.scene.clone();
-  glass2.scale.setScalar(0.01); // match body scale
+  glass2.scale.setScalar(0.01);
   glass2.traverse((node) => {
     if (node?.isMesh) node.material = glassMaterial.clone();
   });
   Car2Container.add(glass2);
 });
-
-Car1Container.rotation.set(CAR_ROTATION.x, CAR_ROTATION.y, CAR_ROTATION.z);
-Car2Container.rotation.set(CAR_ROTATION.x, CAR_ROTATION.y, CAR_ROTATION.z);
 
 // ─── Background Blob ─────────────────────────────────────────────────────────
 
@@ -292,55 +275,49 @@ lil.close();
 
 // ─── Theme Switch ─────────────────────────────────────────────────────────────
 
-/**
- * Switch to a theme by index (0 = orange, 1 = skyblue).
- * Animates: car slide in/out, blob color lerp, bloom settings.
- */
 function switchTheme(newIndex) {
   if (newIndex === currentThemeIndex || isTransitioning) return;
   isTransitioning = true;
+  switchUI(newIndex)
 
   const prevIndex = currentThemeIndex;
   currentThemeIndex = newIndex;
 
-  const newTheme = THEMES[newIndex];
-  const newConfig = THEME_CONFIG[newTheme];
+  const newConfig = THEME_CONFIG[THEMES[newIndex]];
+  const containers = [Car1Container, Car2Container];
 
-  // ── Blob color lerp setup ──
+  // Swap visibility
+  containers[prevIndex].visible = false;
+  containers[newIndex].visible = true;
+
+  // Blob color lerp
   blobLerp.color1From.copy(blobMat.uniforms.color1.value);
   blobLerp.color2From.copy(blobMat.uniforms.color2.value);
   blobLerp.color1To.set(COLORS[newConfig.colorIndices[0]]);
   blobLerp.color2To.set(COLORS[newConfig.colorIndices[1]]);
   blobLerp.t = 0;
 
-  // ── Car slide targets ──
-  // Outgoing car: slide down off screen
-  carState[prevIndex].targetY = -CAR_ANIM.slideDistance;
-  // Incoming car: start above and come down to 0
-  carState[newIndex].y = CAR_ANIM.slideDistance;
-  carState[newIndex].targetY = 0;
-
-  // ── Env map ──
+  // Env map
   scene.environment = newIndex === 0 ? hdri1 : hdri2;
   carMaterial1.envMap = hdri1;
   carMaterial2.envMap = hdri2;
 
-  // ── Bloom ──
+  // Bloom
   Bloom.strength = newConfig.bloom.strength;
   Bloom.radius = newConfig.bloom.radius;
   Bloom.threshold = newConfig.bloom.threshold;
+
+  // isTransitioning unlocks in Animate once blob lerp completes
 }
 
-// ─── Scene Init (called by LoadingManager) ────────────────────────────────────
+// ─── Scene Init ──────────────────────────────────────────────────────────────
 
 function onLoadComplete() {
-  // Apply env maps after HDRIs are loaded
-  scene.environment = hdri2; // default: skyblue
+  scene.environment = hdri2;
   carMaterial1.envMap = hdri1;
   carMaterial2.envMap = hdri2;
 
-  const ambLight = new AmbientLight(0xffffff, 10);
-  scene.add(ambLight);
+  scene.add(new AmbientLight(0xffffff, 10));
 
   const spotLight = new THREE.SpotLight(0xffffff, 3, 5, 0.6, 1, 0.2);
   spotLight.position.set(0, 5, 0);
@@ -355,8 +332,7 @@ function onLoadComplete() {
 function initNav() {
   const buttons = document.querySelectorAll("nav .nav-link");
   const pill = document.getElementById("pill");
-  const container = document.querySelector("nav.nav-links");
-  console.log(buttons, pill, container);
+  const container = document.querySelector("nav .nav-links"); // fixed: space before .nav-links
 
   if (!buttons.length || !pill || !container) return;
 
@@ -372,17 +348,11 @@ function initNav() {
     buttons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     setPillToBtn(btn);
-
-    const themeIndex = parseInt(btn.dataset.theme ?? "0");
-    console.log(themeIndex);
-    switchTheme(themeIndex);
+    switchTheme(parseInt(btn.dataset.theme ?? "0"));
   }
 
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => setActive(btn));
-  });
+  buttons.forEach((btn) => btn.addEventListener("click", () => setActive(btn)));
 
-  // Init pill on first active button
   const firstActive =
     document.querySelector("nav .nav-link.active") ?? buttons[0];
   setActive(firstActive);
@@ -390,12 +360,10 @@ function initNav() {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Smooth easing (ease in-out cubic) */
 function easeInOut(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-/** Linear interpolation */
 function lerp(a, b, t) {
   return a + (b - a) * t;
 }
@@ -412,25 +380,29 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
+// ─── Mouse ───────────────────────────────────────────────────────────────────
+
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX / innerWidth - 0.5 - 1; // fixed: was (... - 0.5) - 1
+  mouse.y = (e.clientY / innerHeight - 0.5) * 2;
+});
+
 // ─── Animation Loop ──────────────────────────────────────────────────────────
 
 const clock = new THREE.Clock();
-const LERP_SPEED = .75; // higher = snappier slide
-
-lil.destroy();
 
 function Animate() {
-  stats.begin();
+  // stats.begin();
 
   const DT = clock.getDelta();
   const elapsed = clock.getElapsedTime();
 
   controls.update();
 
-  // ── Blob time ──
+  // Blob time
   blobMat.uniforms.uTime.value = elapsed;
 
-  // ── Blob color lerp ──
+  // Blob color lerp — unlock isTransitioning when done
   if (blobLerp.t < 1) {
     blobLerp.t = Math.min(blobLerp.t + DT * 1.5, 1);
     const et = easeInOut(blobLerp.t);
@@ -444,34 +416,32 @@ function Animate() {
       blobLerp.color2To,
       et,
     );
+    if (blobLerp.t >= 1) isTransitioning = false;
   }
 
-  // ── Floating animation for active car ──
+  // Float only the active car
   const floatY =
     Math.sin(elapsed * CAR_ANIM.floatSpeed * Math.PI * 2) *
     CAR_ANIM.floatAmplitude;
+  const activeContainer =
+    currentThemeIndex === 0 ? Car1Container : Car2Container;
+  activeContainer.position.y = floatY;
 
-  // ── Slide cars ──
-  const containers = [Car1Container, Car2Container];
-  // In Animate(), after sliding cars:
-  containers.forEach((container, i) => {
-    const state = carState[i];
-    const isActive = i === currentThemeIndex;
-    const speed = isActive ? LERP_SPEED * 6 : LERP_SPEED; // incoming fast, outgoing slow
-    state.y = lerp(state.y, state.targetY, Math.min(DT * speed, 1));
-    container.position.y = state.y + (isActive ? floatY : 0);
-  });
+  // Mouse rotation on both containers so orientation is always in sync
+  targetRotation.y = lerp(targetRotation.y, mouse.x * 0.4, DT * 3);
+  targetRotation.x = lerp(targetRotation.x, mouse.y * 0.15, DT * 3);
 
-  // Unlock when active car is close enough to rest position
-  const activeState = carState[currentThemeIndex];
-  if (isTransitioning && Math.abs(activeState.y - activeState.targetY) < 0.05) {
-    isTransitioning = false;
-  }
+  Car1Container.rotation.y = CAR_ROTATION.y + targetRotation.y;
+  Car2Container.rotation.y = CAR_ROTATION.y + targetRotation.y;
+  Car1Container.rotation.x = CAR_ROTATION.x + targetRotation.x;
+  Car2Container.rotation.x = CAR_ROTATION.x + targetRotation.x;
 
   Composer.render();
 
-  stats.end();
+  // stats.end();
   requestAnimationFrame(Animate);
 }
+
+lil.destroy()
 
 requestAnimationFrame(Animate);
