@@ -16,6 +16,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { runLoader } from "./loader";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -278,7 +279,7 @@ lil.close();
 function switchTheme(newIndex) {
   if (newIndex === currentThemeIndex || isTransitioning) return;
   isTransitioning = true;
-  switchUI(newIndex)
+  switchUI(newIndex);
 
   const prevIndex = currentThemeIndex;
   currentThemeIndex = newIndex;
@@ -325,26 +326,31 @@ function onLoadComplete() {
 
   resize();
   initNav();
+  runLoader();
+}
+
+let currentBtn, buttons, pill, container;
+
+function setPillToBtn(btn) {
+  if (!btn) return;
+  const btnRect = btn.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  pill.style.left = btnRect.left - containerRect.left + "px";
+  pill.style.width = btnRect.width + "px";
+  pill.style.height = btnRect.height + "px";
 }
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
 
 function initNav() {
-  const buttons = document.querySelectorAll("nav .nav-link");
-  const pill = document.getElementById("pill");
-  const container = document.querySelector("nav .nav-links"); // fixed: space before .nav-links
+  buttons = document.querySelectorAll("nav .nav-link");
+  pill = document.getElementById("pill");
+  container = document.querySelector("nav .nav-links"); // fixed: space before .nav-links
 
   if (!buttons.length || !pill || !container) return;
 
-  function setPillToBtn(btn) {
-    const btnRect = btn.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    pill.style.left = btnRect.left - containerRect.left + "px";
-    pill.style.width = btnRect.width + "px";
-    pill.style.height = btnRect.height + "px";
-  }
-
   function setActive(btn) {
+    currentBtn = btn;
     buttons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     setPillToBtn(btn);
@@ -371,6 +377,7 @@ function lerp(a, b, t) {
 // ─── Resize ──────────────────────────────────────────────────────────────────
 
 function resize() {
+  setPillToBtn(currentBtn);
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
@@ -442,6 +449,13 @@ function Animate() {
   requestAnimationFrame(Animate);
 }
 
-lil.destroy()
+lil.destroy();
 
 requestAnimationFrame(Animate);
+
+document.addEventListener("pointerdown", () => {
+  document.body.style.cursor = "grabbing";
+});
+document.addEventListener("pointerup", () => {
+  document.body.style.cursor = "grab";
+});
