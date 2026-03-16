@@ -176,7 +176,7 @@ scene.add(Car2Container);
 
 // ─── Load Car Models ─────────────────────────────────────────────────────────
 
-GLB.load("/car_body.glb", (glb) => {
+GLB.load("/car_body.compressed.glb", (glb) => {
   const body1 = glb.scene;
   body1.scale.setScalar(0.01);
   body1.traverse((node) => {
@@ -192,7 +192,7 @@ GLB.load("/car_body.glb", (glb) => {
   Car2Container.add(body2);
 });
 
-GLB.load("/car_glass.glb", (glb) => {
+GLB.load("/car_glass.compressed.glb", (glb) => {
   const glass1 = glb.scene;
   glass1.scale.setScalar(0.01);
   glass1.traverse((node) => {
