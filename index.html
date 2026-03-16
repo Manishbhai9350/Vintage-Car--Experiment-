@@ -16,173 +16,87 @@
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <canvas></canvas>
-    <div id="loader">
-      <!-- White bottom layer -->
-      <div id="loader-white"></div>
+    <div class="loader">
+      <p>Inferno / Glacier</p>
+    </div>
+    <main>
+      <canvas></canvas>
 
-      <!-- Black top layer with SVG car mask -->
-      <div id="loader-black">
-        <svg
-          id="loader-svg"
-          xmlns="http://www.w3.org/2000/svg"
-          width="100%"
-          height="100%"
-          viewBox="0 0 1440 900"
-          preserveAspectRatio="xMidYMid slice"
-        >
-          <defs>
-            <mask id="car-mask">
-              <!-- White fill = visible black, black fill (car shape) = hole/cutout -->
-              <rect width="1440" height="900" fill="white" />
-              <!-- Car silhouette centered — this becomes the transparent cutout -->
-              <g id="car-silhouette" transform="translate(720,450)">
-                <path
-                  fill="black"
-                  d="
-                M-260,40
-                C-260,40 -230,-10 -200,-30
-                C-170,-50 -140,-65 -100,-72
-                C-70,-78 -40,-80 0,-80
-                C40,-80 80,-75 110,-65
-                C140,-55 160,-40 180,-20
-                C195,-5 210,10 220,25
-                C235,25 248,28 255,35
-                C262,42 265,52 264,62
-                C263,72 258,80 250,84
-                C242,88 232,88 220,86
-                C215,100 205,110 190,116
-                C175,122 158,122 143,116
-                C128,110 118,100 113,86
-                L-113,86
-                C-118,100 -128,110 -143,116
-                C-158,122 -175,122 -190,116
-                C-205,110 -215,100 -220,86
-                C-232,88 -242,88 -250,84
-                C-258,80 -263,72 -264,62
-                C-265,52 -262,42 -255,35
-                C-248,28 -235,25 -220,25
-                C-240,10 -255,-5 -262,-20
-                C-262,-20 -260,40 -260,40
-                Z
+      <!-- ── Nav ─────────────────────────────────────────────────── -->
+      <nav>
+        <div class="nav-logo">
+          <span class="logo-main">VELOX</span>
+          <span class="logo-sub">Automotive</span>
+        </div>
 
-                M-80,-78
-                C-80,-78 -60,-72 -30,-60
-                C0,-48 30,-35 55,-20
-                L55,-78
-                Z
+        <div class="nav-links" id="navLinks">
+          <div class="pill" id="pill"></div>
+          <button class="nav-link active" data-theme="0">Inferno</button>
+          <button class="nav-link" data-theme="1">Glacier</button>
+        </div>
 
-                M65,-78
-                L65,-18
-                C90,-32 120,-48 150,-60
-                C175,-70 195,-76 195,-76
-                Z
+        <a href="mailto:developermanish93@gmail.com" class="nav-cta">
+          Contact
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path
+              d="M2.5 6h7M6 2.5l3.5 3.5L6 9.5"
+              stroke="currentColor"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </nav>
 
-                M-190,62
-                C-190,46 -178,34 -162,34
-                C-146,34 -134,46 -134,62
-                C-134,78 -146,90 -162,90
-                C-178,90 -190,78 -190,62
-                Z
+      <!-- ── Hero Text Left ───────────────────────────────────────── -->
+      <div class="hero-left" id="heroLeft">
+        <div class="hero-eyebrow" id="heroEyebrow">
+          <span class="eyebrow-line"></span>
+          <span class="eyebrow-text" id="eyebrowText">Series I — 2025</span>
+        </div>
 
-                M134,62
-                C134,46 146,34 162,34
-                C178,34 190,46 190,62
-                C190,78 178,90 162,90
-                C146,90 134,78 134,62
-                Z
-              "
-                />
-              </g>
-            </mask>
-          </defs>
+        <h1 class="hero-title" id="heroTitle">
+          <span class="title-line" id="titleLine1"></span>
+          <span class="title-line title-italic" id="titleLine2"></span>
+        </h1>
 
-          <!-- Black rect with car cutout applied via mask -->
-          <rect width="1440" height="900" fill="black" mask="url(#car-mask)" />
-        </svg>
+        <p class="hero-body" id="heroBody"></p>
 
-        <!-- Loading label -->
-        <div id="loader-label">
-          <span id="loader-pct">0</span><span class="loader-unit">%</span>
+        <div class="hero-stats" id="heroStats">
+          <div class="stat">
+            <span class="stat-value" id="stat1Val"></span>
+            <span class="stat-label" id="stat1Lab"></span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="stat2Val"></span>
+            <span class="stat-label" id="stat2Lab"></span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="stat3Val"></span>
+            <span class="stat-label" id="stat3Lab"></span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ── Nav ─────────────────────────────────────────────────── -->
-    <nav>
-      <div class="nav-logo">
-        <span class="logo-main">VELOX</span>
-        <span class="logo-sub">Automotive</span>
+      <!-- ── Bottom Right Tag ─────────────────────────────────────── -->
+      <div class="bottom-tag" id="bottomTag">
+        <span class="tag-label" id="tagLabel"></span>
+        <span class="tag-edition" id="tagEdition"></span>
       </div>
 
-      <div class="nav-links" id="navLinks">
-        <div class="pill" id="pill"></div>
-        <button class="nav-link active" data-theme="0">Inferno</button>
-        <button class="nav-link" data-theme="1">Glacier</button>
+      <!-- ── Bottom Left scroll hint ─────────────────────────────── -->
+      <div class="scroll-hint">
+        <span class="scroll-text">Drag to explore</span>
+        <div class="scroll-track"><div class="scroll-thumb"></div></div>
       </div>
 
-      <a href="mailto:developermanish93@gmail.com" class="nav-cta">
-        Contact
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path
-            d="M2.5 6h7M6 2.5l3.5 3.5L6 9.5"
-            stroke="currentColor"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </a>
-    </nav>
-
-    <!-- ── Hero Text Left ───────────────────────────────────────── -->
-    <div class="hero-left" id="heroLeft">
-      <div class="hero-eyebrow" id="heroEyebrow">
-        <span class="eyebrow-line"></span>
-        <span class="eyebrow-text" id="eyebrowText">Series I — 2025</span>
-      </div>
-
-      <h1 class="hero-title" id="heroTitle">
-        <span class="title-line" id="titleLine1"></span>
-        <span class="title-line title-italic" id="titleLine2"></span>
-      </h1>
-
-      <p class="hero-body" id="heroBody"></p>
-
-      <div class="hero-stats" id="heroStats">
-        <div class="stat">
-          <span class="stat-value" id="stat1Val"></span>
-          <span class="stat-label" id="stat1Lab"></span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-value" id="stat2Val"></span>
-          <span class="stat-label" id="stat2Lab"></span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-value" id="stat3Val"></span>
-          <span class="stat-label" id="stat3Lab"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Bottom Right Tag ─────────────────────────────────────── -->
-    <div class="bottom-tag" id="bottomTag">
-      <span class="tag-label" id="tagLabel"></span>
-      <span class="tag-edition" id="tagEdition"></span>
-    </div>
-
-    <!-- ── Bottom Left scroll hint ─────────────────────────────── -->
-    <div class="scroll-hint">
-      <span class="scroll-text">Drag to explore</span>
-      <div class="scroll-track"><div class="scroll-thumb"></div></div>
-    </div>
-
-    <!-- ── Corner decorations ──────────────────────────────────── -->
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-br"></div>
-
+      <!-- ── Corner decorations ──────────────────────────────────── -->
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-br"></div>
+    </main>
     <script type="module" src="./src/ui.js"></script>
     <script type="module" src="./src/main.js"></script>
   </body>
